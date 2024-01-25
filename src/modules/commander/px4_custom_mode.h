@@ -50,7 +50,9 @@ enum PX4_CUSTOM_MAIN_MODE {
 	PX4_CUSTOM_MAIN_MODE_OFFBOARD,
 	PX4_CUSTOM_MAIN_MODE_STABILIZED,
 	PX4_CUSTOM_MAIN_MODE_RATTITUDE_LEGACY,
-	PX4_CUSTOM_MAIN_MODE_SIMPLE /* unused, but reserved for future use */
+	PX4_CUSTOM_MAIN_MODE_SIMPLE, /* unused, but reserved for future use */
+	PX4_CUSTOM_MAIN_MODE_AI
+
 };
 
 enum PX4_CUSTOM_SUB_MODE_AUTO {
@@ -171,6 +173,11 @@ static inline union px4_custom_mode get_px4_custom_mode(uint8_t nav_state)
 		custom_mode.main_mode = PX4_CUSTOM_MAIN_MODE_AUTO;
 		custom_mode.sub_mode = PX4_CUSTOM_SUB_MODE_AUTO_VTOL_TAKEOFF;
 		break;
+
+	case vehicle_status_s::NAVIGATION_STATE_AI:
+		custom_mode.main_mode = PX4_CUSTOM_MAIN_MODE_AI;
+		break;
+
 	}
 
 	return custom_mode;

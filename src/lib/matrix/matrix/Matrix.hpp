@@ -111,6 +111,17 @@ public:
 		return (*this);
 	}
 
+
+	void setData(Type data_[M][N])
+	{
+		for (size_t i = 0; i < M; i++) {
+			for (size_t j = 0; j < N; j++) {
+				_data[i][j] = data_[i][j];
+			}
+		}
+	}
+
+
 	void copyTo(Type dst[M * N]) const
 	{
 		const Matrix<Type, M, N> &self = *this;
@@ -370,6 +381,38 @@ public:
 		char string[n];
 		write_string(string, n);
 		printf("%s\n", string);
+	}
+
+	void mrelu()
+	{
+		for (size_t i = 0; i < M; i++) {
+			for (size_t j = 0; j < N; j++) {
+				if (_data[i][j] < 0) {
+					_data[i][j] = 0;
+				}
+			}
+		}
+	}
+
+	void mLeakyRelu()
+	{
+		for (size_t i = 0; i < M; i++) {
+			for (size_t j = 0; j < N; j++) {
+				if (_data[i][j] < 0) {
+					_data[i][j] = 0.2f * _data[i][j];
+				}
+			}
+		}
+	}
+
+
+	void mtanh()
+	{
+		for (size_t i = 0; i < M; i++) {
+			for (size_t j = 0; j < N; j++) {
+				_data[i][j] = tanh(_data[i][j]);
+			}
+		}
 	}
 
 	Matrix<Type, N, M> transpose() const

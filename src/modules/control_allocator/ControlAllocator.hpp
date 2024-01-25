@@ -76,6 +76,17 @@
 #include <uORB/topics/vehicle_thrust_setpoint.h>
 #include <uORB/topics/vehicle_status.h>
 #include <uORB/topics/failure_detector_status.h>
+#include <uORB/topics/vehicle_control_mode.h>
+#include <uORB/topics/actuator_outputs.h>
+#include <lib/matrix/matrix/Matrix.hpp>
+#include <uORB/topics/vehicle_angular_velocity.h>
+#include <uORB/topics/vehicle_attitude.h>
+#include <uORB/topics/vehicle_local_position.h>
+#include <uORB/topics/hover_thrust_estimate.h>
+// #include <iostream>
+
+// #include <fstream>
+// #include <chrono>
 
 class ControlAllocator : public ModuleBase<ControlAllocator>, public ModuleParams, public px4::ScheduledWorkItem
 {
@@ -181,6 +192,19 @@ private:
 	uORB::Publication<actuator_servos_s>	_actuator_servos_pub{ORB_ID(actuator_servos)};
 	uORB::Publication<actuator_servos_trim_s>	_actuator_servos_trim_pub{ORB_ID(actuator_servos_trim)};
 
+	//added for ai
+	uORB::Subscription _vehicle_control_mode_sub{ORB_ID(vehicle_control_mode)}; /* vehicle control mode */
+	uORB::Subscription _hover_thrust_estimate_sub{ORB_ID(hover_thrust_estimate)};
+	uORB::SubscriptionCallbackWorkItem _local_pos_sub{this, ORB_ID(vehicle_local_position)};	/**< vehicle local position */
+	uORB::SubscriptionCallbackWorkItem _vehicle_angular_velocity_sub{this, ORB_ID(vehicle_angular_velocity)}; /** vehicle angular vel + rates */
+	uORB::SubscriptionCallbackWorkItem _vehicle_attitude_sub{this, ORB_ID(vehicle_attitude)}; /** vehicle attitude sub */
+
+	vehicle_local_position_s vehicle_local_position;
+	vehicle_angular_velocity_s angular_velocity;
+	vehicle_attitude_s vehicle_attitude;
+	hover_thrust_estimate_s hte;
+
+
 	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
 
 	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
@@ -199,6 +223,8 @@ private:
 	hrt_abstime _last_run{0};
 	hrt_abstime _timestamp_sample{0};
 	hrt_abstime _last_status_pub{0};
+	vehicle_control_mode_s _vehicle_control_mode{};
+
 
 	ParamHandles _param_handles{};
 	Params _params{};
@@ -210,5 +236,27 @@ private:
 		(ParamInt<px4::params::CA_FAILURE_MODE>) _param_ca_failure_mode,
 		(ParamInt<px4::params::CA_R_REV>) _param_r_rev
 	)
+
+
+	matrix::Matrix<float, 32, 16> policy_network_w0;
+	matrix::Matrix<float, 32, 1> policy_network_b0;
+	matrix::Matrix<float, 32, 32> policy_network_w1;
+	matrix::Matrix<float, 32, 1> policy_network_b1;
+	matrix::Matrix<float, 32, 32> policy_network_w2;
+	matrix::Matrix<float, 32, 1> policy_network_b2;
+	matrix::Matrix<float, 4, 32> policy_network_w3;
+	matrix::Matrix<float, 4, 1> policy_network_b3;
+
+	float a0;
+	float a1;
+	float a2;
+	float a3;
+
+	hrt_abstime _last_execution;
+
+	float hover_thrust;
+	float min_hover_thrust;
+
+	// std::ofstream fs;
 
 };

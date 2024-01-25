@@ -38,6 +38,8 @@
 #include <mathlib/math/Limits.hpp>
 #include <mathlib/math/Functions.hpp>
 #include <px4_platform_common/events.h>
+// #include <iostream>
+// #include <chrono>
 
 using namespace matrix;
 using namespace time_literals;
@@ -107,6 +109,8 @@ MulticopterRateControl::Run()
 	}
 
 	perf_begin(_loop_perf);
+	// auto start = std::chrono::high_resolution_clock::now();
+
 
 	// Check if parameters have changed
 	if (_parameter_update_sub.updated()) {
@@ -263,6 +267,9 @@ MulticopterRateControl::Run()
 	}
 
 	perf_end(_loop_perf);
+	// auto end = std::chrono::high_resolution_clock::now();
+	// std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+	// std::cout << "MulticopterRateControl.cpp PID time taken: " << duration.count() << " microseconds" << std::endl;
 }
 
 void MulticopterRateControl::updateActuatorControlsStatus(const vehicle_torque_setpoint_s &vehicle_torque_setpoint,
